@@ -42,6 +42,12 @@ def distance():
     return TimeElapsed
 
 
+def Is_Ice(data):
+
+    is ice = False
+    
+    is_ice = True
+
 if __name__ == '__main__':
     try:
         runs = []
@@ -50,13 +56,19 @@ if __name__ == '__main__':
         for i in range(0, 10):
             for i in range(0, 50):
                 total += distance()
-                # print("Measured Distance = %.1f cm" % dist)
+                #print("Measured Distance = %.1f cm" % dist)
                 time.sleep(.01)
 
             runs.append(total/50)
-            total = 0
+	    print(total/50)
+	    if (total/50 < 0.0005):
+		print("Ice")
+	    else:
+		print("Sand")
 
-        print(f"Runs: {runs}")
+            total = 0
+	
+        print("Runs: {runs}")
 
         # Reset by pressing CTRL + C
     except KeyboardInterrupt:
