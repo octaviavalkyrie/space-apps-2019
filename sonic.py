@@ -8,10 +8,12 @@ GPIO.setmode(GPIO.BCM)
 # set GPIO Pins
 GPIO_TRIGGER = 24
 GPIO_ECHO = 23
+GPIO_LED = 26
 
 # set GPIO direction (IN / OUT)
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
+GPIO.setup(GPIO_LED, GPIO.OUT)
 
 
 def distance():
@@ -42,33 +44,41 @@ def distance():
     return TimeElapsed
 
 
-def Is_Ice(data):
+def is_ice(data):
 
-    is ice = False
-    
-    is_ice = True
+    result = False
+
+    if (data < 0.00052):
+        result = True
+        time.sleep(1)
+        return result
+    else:
+        return result
+
 
 if __name__ == '__main__':
+    #GPIO.output(GPIO_LED, True)
+
     try:
         runs = []
         total = 0
 
-        for i in range(0, 10):
-            for i in range(0, 50):
-                total += distance()
-                #print("Measured Distance = %.1f cm" % dist)
-                time.sleep(.01)
+        for i in range(0, 50):
+            total += distance()
+            #print("Measured Distance = %.1f cm" % dist)
+            time.sleep(.01)
 
-            runs.append(total/50)
-	    print(total/50)
-	    if (total/50 < 0.0005):
-		print("Ice")
-	    else:
-		print("Sand")
+        sample = total/50
+        runs.append(sample)
 
-            total = 0
-	
-        print("Runs: {runs}")
+        if is_ice(sample):
+            print("Ice.")
+            GPIO.output(GPIO_LED, True)
+        else:
+            print("Not ice.")
+            GPIO.output(GPIO_LED, False)
+
+        GPIO.output(GPIO_LED, False)
 
         # Reset by pressing CTRL + C
     except KeyboardInterrupt:
