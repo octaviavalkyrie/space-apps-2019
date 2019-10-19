@@ -1,17 +1,18 @@
-#Libraries
+# Libraries
 import RPi.GPIO as GPIO
 import time
 
-#GPIO Mode (BOARD / BCM)
+# GPIO Mode (BOARD / BCM)
 GPIO.setmode(GPIO.BCM)
 
-#set GPIO Pins
-GPIO_TRIGGER = 18
-GPIO_ECHO = 24
+# set GPIO Pins
+GPIO_TRIGGER = 24
+GPIO_ECHO = 23
 
-#set GPIO direction (IN / OUT)
+# set GPIO direction (IN / OUT)
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
+
 
 def distance():
     # set Trigger to HIGH
@@ -38,14 +39,24 @@ def distance():
     # and divide by 2, because there and back
     distance = (TimeElapsed * 34300) / 2
 
-    return distance
+    return TimeElapsed
+
 
 if __name__ == '__main__':
     try:
-        while True:
-            dist = distance()
-            print ("Measured Distance = %.1f cm" % dist)
-            time.sleep(1)
+        runs = []
+        total = 0
+
+        for i in range(0, 10):
+            for i in range(0, 50):
+                total += distance()
+                # print("Measured Distance = %.1f cm" % dist)
+                time.sleep(.01)
+
+            runs.append(total/50)
+            total = 0
+
+        print(f"Runs: {runs}")
 
         # Reset by pressing CTRL + C
     except KeyboardInterrupt:
