@@ -48,7 +48,7 @@ def is_ice(data):
 
     result = False
 
-    if (data < 0.00052):
+    if (data < 0.00054):
         result = True
         time.sleep(1)
         return result
@@ -70,6 +70,7 @@ if __name__ == '__main__':
 
         sample = total/50
         runs.append(sample)
+	print(total/50)
 
         if is_ice(sample):
             print("Ice.")
