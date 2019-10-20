@@ -27,9 +27,14 @@ def distance():
     StartTime = time.time()
     StopTime = time.time()
 
+    start_sample = time.time()
+
     # save StartTime
-    while GPIO.input(GPIO_ECHO) == 0:
+    while GPIO.input(GPIO_ECHO) == 0 and time.time() - start_sample < 1:
         StartTime = time.time()
+
+    if time.time() - start_sample > 1:
+        return None
 
     # save time of arrival
     while GPIO.input(GPIO_ECHO) == 1:
@@ -39,12 +44,14 @@ def distance():
     TimeElapsed = StopTime - StartTime
     # multiply with the sonic speed (34300 cm/s)
     # and divide by 2, because there and back
-    distance = (TimeElapsed * 34300) / 2
+    dist = (TimeElapsed * 34300) / 2
 
     return TimeElapsed
 
 
 def is_ice(data):
+    if data is None:
+        return False
 
     result = False
 
@@ -60,26 +67,30 @@ if __name__ == '__main__':
     #GPIO.output(GPIO_LED, True)
 
     try:
-        runs = []
-        total = 0
+        while True:
+            runs = []
+            total = 0
+            count = 0
 
-        for i in range(0, 50):
-            total += distance()
-            #print("Measured Distance = %.1f cm" % dist)
-            time.sleep(.01)
+            for i in range(0, 10):
+                dist = distance()
+                if dist:
+                    total += dist
+                    count += 1
+                time.sleep(.01)
 
-        sample = total/50
-        runs.append(sample)
-	print(total/50)
+            sample = total/count
+            runs.append(sample)
+            print(total/50*1000000)
 
-        if is_ice(sample):
-            print("Ice.")
-            GPIO.output(GPIO_LED, True)
-        else:
-            print("Not ice.")
-            GPIO.output(GPIO_LED, False)
+            if is_ice(sample):
+                print("Ice.")
+                GPIO.output(GPIO_LED, True)
+            else:
+                print("Not ice.")
+                GPIO.output(GPIO_LED, False)
 
-        GPIO.output(GPIO_LED, False)
+            # GPIO.output(GPIO_LED, False)
 
         # Reset by pressing CTRL + C
     except KeyboardInterrupt:
